@@ -2103,12 +2103,12 @@ int main(void)
         return 1;
     }
 
-    /* if (!loadSounds()) { */
-    /*     if (olvl >= O_NORMAL) { */
-    /*         fprintf(stderr, "ERROR: Failed to load sound files.\n"); */
-    /*     } */
-    /*     return 1; */
-    /* } */
+    if (!loadSounds()) {
+        if (olvl >= O_NORMAL) {
+            fprintf(stderr, "ERROR: Failed to load sound files.\n");
+        }
+        return 1;
+    }
 
     if (!loadFonts()) {
         if (olvl >= O_NORMAL) {
@@ -2124,8 +2124,8 @@ int main(void)
     curScene = &mainMenu;
     curScene->displayFunc();
 
-    /* if (music) */
-    /*     playBGM(); */
+    if (music)
+        playBGM();
 
     for (;;) {
         while (SDL_PollEvent(&event)) {
