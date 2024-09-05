@@ -2234,9 +2234,9 @@ int main(void)
                 SDL_Delay(1000/FPS_CAP - delta);
             }
 
-            /* if (curScene->logicFunc()) { */
-            /*     curScene->displayFunc(); */
-            /* } */
+            if (curScene->logicFunc()) {
+                 curScene->displayFunc();
+            }
         }
     }
 
