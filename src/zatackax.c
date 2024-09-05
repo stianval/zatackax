@@ -1918,10 +1918,9 @@ void putPixel(int x, int y, SDL_Color c, unsigned char *target)
  */
 void colorFill(SDL_Color c, SDL_Surface *sprite)
 {
-    unsigned char *target = sprite->pixels;
-
     for (int yy = 0; yy < sprite->h; ++yy) {
-        for (int xx = 0; xx < sprite->w; ++xx, target += 4) {
+        for (int xx = 0; xx < sprite->w; ++xx) {
+            unsigned char *target = (unsigned char *) sprite->pixels + yy * sprite->pitch + xx * sprite->format->BytesPerPixel;
             target[0] *= c.b / 255.0;
             target[1] *= c.g / 255.0;
             target[2] *= c.r / 255.0;
