@@ -1986,7 +1986,7 @@ int init(void)
 
     SDL_ShowCursor(SDL_DISABLE);
     SDL_Surface *icon = loadIcon("icon.bmp");
-    /* SDL_WM_SetIcon(icon, NULL); */
+    SDL_SetWindowIcon(window, icon);
     SDL_FreeSurface(icon);
 
     return 1;
@@ -2087,10 +2087,10 @@ int main(void)
     initPlayers1();
     restoreSettings();
 
-    if (!init())
+    if (!initScreen())
         return 1;
 
-    if (!initScreen())
+    if (!init())
         return 1;
 
     initHitMap(WINDOW_W, WINDOW_H);
