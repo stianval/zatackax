@@ -69,7 +69,6 @@ bool loadImage(Image i, const char *filename)
         printf("Loaded: %s\t(w:%d h:%d bpp:%d)\n", filename, images[i]->w,
                images[i]->h, 32);
     }
-    SDL_FreeSurface(loadedImage);
 
     free(file);
     return true;
