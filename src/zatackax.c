@@ -1217,7 +1217,7 @@ void resetWeapons(void)
  */
 void initMainMenu(void)
 {
-    /* colorBalls(); */
+    colorBalls();
 }
 
 /**
@@ -1285,30 +1285,30 @@ void displayMainMenu(void)
     displayMenu(c, &menuMain, ymod);
     SDL_Rect offset = {WINDOW_W / 2 - logo->w / 2, WINDOW_H / 2 - logo->h,
                        0, 0};
-    /* SDL_BlitSurface(logo, NULL, screen, &offset); */
+    SDL_BlitSurface(logo, NULL, screen, &offset);
 
     /* This could/should be made smoother... */
-    /* for (int i = 0; i < nPlayers; ++i) { */
-    /*     offset.x = (WINDOW_W / 2)            /\* window offset *\/ */
-    /*         - 60                             /\* temp. offset *\/ */
-    /*         + (i - nPlayers) * BALL_SPACING; /\* player modifier *\/ */
+    for (int i = 0; i < nPlayers; ++i) {
+        offset.x = (WINDOW_W / 2)            /* window offset */
+            - 60                             /* temp. offset */
+            + (i - nPlayers) * BALL_SPACING; /* player modifier */
 
-    /*     offset.y = (WINDOW_H / 2)            /\* window offset *\/ */
-    /*         - BALL_Y_MOD + ymod;             /\* temp. offset *\/ */
+        offset.y = (WINDOW_H / 2)            /* window offset */
+            - BALL_Y_MOD + ymod;             /* temp. offset */
 
-    /*     SDL_BlitSurface(pballs[i], NULL, screen, &offset); */
-    /* } */
+        SDL_BlitSurface(pballs[i], NULL, screen, &offset);
+    }
 
-    /* for (int i = nPlayers; i < MAX_PLAYERS; ++i) { */
-    /*     offset.x = (WINDOW_W / 2)            /\* window offset *\/ */
-    /*         + 68                             /\* temp. offset *\/ */
-    /*         + (i - nPlayers) * BALL_SPACING; /\* player modifier *\/ */
+    for (int i = nPlayers; i < MAX_PLAYERS; ++i) {
+        offset.x = (WINDOW_W / 2)            /* window offset */
+            + 68                             /* temp. offset */
+            + (i - nPlayers) * BALL_SPACING; /* player modifier */
 
-    /*     offset.y = (WINDOW_H / 2)            /\* window offset *\/ */
-    /*         - BALL_Y_MOD + ymod;             /\* temp. offset *\/ */
+        offset.y = (WINDOW_H / 2)            /* window offset */
+            - BALL_Y_MOD + ymod;             /* temp. offset */
 
-    /*     SDL_BlitSurface(pballs[MAX_PLAYERS], NULL, screen, &offset); */
-    /* } */
+        SDL_BlitSurface(pballs[MAX_PLAYERS], NULL, screen, &offset);
+    }
 
     SDL_UpdateTexture(screen_t, NULL, screen->pixels, screen->pitch);
     SDL_RenderClear(renderer);
@@ -2014,12 +2014,12 @@ void initGraphics(void)
     /* Make arrow copies */
     parrows = malloc(MAX_PLAYERS * sizeof(SDL_Surface *));
     p = parrows;
-        for (int i = 0; i < MAX_PLAYERS; ++i, ++p) {
-        *p = SDL_CreateRGBSurface(0, arrows->w, arrows->h, 32,
-                                  0x00ff0000,
-                                  0x0000ff00,
-                                  0x000000ff,
-                                  0xff000000);
+    for (int i = 0; i < MAX_PLAYERS; ++i, ++p) {
+        *p = SDL_CreateRGBSurface(0, arrows->w, arrows->h, arrows->format->BitsPerPixel,
+                                  arrows->format->Rmask,
+                                  arrows->format->Gmask,
+                                  arrows->format->Bmask,
+                                  arrows->format->Amask);
     }
 
     /* Make ball copies */
@@ -2027,11 +2027,11 @@ void initGraphics(void)
     p = pballs;
     SDL_Surface *ball = images[IMG_BALL];
     for (int i = 0; i < MAX_PLAYERS + 1; ++i, ++p) {
-        *p = SDL_CreateRGBSurface(0, ball->w, ball->h, 32,
-                                  0x00ff0000,
-                                  0x0000ff00,
-                                  0x000000ff,
-                                  0xff000000);
+        *p = SDL_CreateRGBSurface(ball->flags, ball->w, ball->h, ball->format->BitsPerPixel,
+                                  ball->format->Rmask,
+                                  ball->format->Gmask,
+                                  ball->format->Bmask,
+                                  ball->format->Amask);
     }
 
     /* Initialize weapon pointer array */
