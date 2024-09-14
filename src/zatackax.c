@@ -585,7 +585,7 @@ void addToHitMap(unsigned int x, unsigned int y, unsigned char player,
                     &hitmap[sizeof(bool) * ((WINDOW_W * ypx) + xpx)];
                 struct player *p = &players[player - 1];
 
-                putPixel(xpx, ypx, colors[p->color], gameScreen->pixels);
+                putPixel(xpx, ypx, colors[p->color], gameScreen);
 
                 if (*hit == 0) {
                     struct recentMapPiece *new
@@ -603,6 +603,7 @@ void addToHitMap(unsigned int x, unsigned int y, unsigned char player,
                     if (player == *hit) {
                         if (olvl >= O_VERBOSE)
                             printf("Player %d committed suicide!\n", player);
+                        SDL_UnlockSurface(gameScreen);
                         killPlayer(player, *hit);
                     } else if (!p->inv_others) {
                         int killer = *hit;
@@ -612,6 +613,7 @@ void addToHitMap(unsigned int x, unsigned int y, unsigned char player,
                         if (olvl >= O_VERBOSE)
                             printf("Player %d crashed into Player %d!\n",
                                    player, killer);
+                        SDL_UnlockSurface(gameScreen);
                         killPlayer(player, killer);
                     }
                     if (olvl >= O_DEBUG)
@@ -625,6 +627,7 @@ void addToHitMap(unsigned int x, unsigned int y, unsigned char player,
                 if (olvl >= O_DEBUG)
                     fprintf(stderr, "Player %d walled at: (%d, %d)\n",
                             player, xpx, ypx);
+                SDL_UnlockSurface(gameScreen);
                 killPlayer(player, 0);
                 return;
             }
@@ -664,7 +667,7 @@ void updateHitMap(Uint32 delta)
             &hitmap[sizeof(bool) * ((WINDOW_W * cur->y) + cur->x)];
         if (holes && cur->count <= HOLE_DELAY && *at > MAX_PLAYERS * 2) {
             *at = 0;
-            putPixel(cur->x, cur->y, cMenuBG, gameScreen->pixels);
+            putPixel(cur->x, cur->y, cMenuBG, gameScreen);
             prev->next = cur->next;
             free(cur);
             cur = prev->next;
@@ -930,7 +933,6 @@ int logicGame(void)
         updateParticles(delta);
     }
 
-    SDL_UnlockSurface(gameScreen);
     return 1;
 }
 
@@ -1018,17 +1020,15 @@ void displayGameStart(void)
  */
 void refreshGameScreen(void)
 {
-    SDL_UnlockSurface(gameScreen);
     clearSurface(gameScreen);
 
     drawExtras();
 
     SDL_LockSurface(gameScreen);
 
-    unsigned char *target = gameScreen->pixels;
-
     for (unsigned int yy = 0; yy < WINDOW_H; ++yy) {
-        for (unsigned int xx = 0; xx < WINDOW_W; ++xx, target += 4) {
+        for (unsigned int xx = 0; xx < WINDOW_W; ++xx) {
+            unsigned char *target = (unsigned char *) gameScreen->pixels + yy * gameScreen->pitch + xx * gameScreen->format->BytesPerPixel;
             char charat = hitmap[sizeof(bool)
                                  * ((WINDOW_W * yy) + xx)];
             if (charat != 0) {
@@ -1045,6 +1045,7 @@ void refreshGameScreen(void)
                 target[0] = (&colors[p->color])->b;
                 target[1] = (&colors[p->color])->g;
                 target[2] = (&colors[p->color])->r;
+                target[3] = 255;
             }
         }
     }
@@ -1898,14 +1899,17 @@ void displayMenu(char *c[], struct menu *m, int ymod)
  * @param x x coordinate of the pixel destination.
  * @param y y coordinate of the pixel destination.
  * @param c Desired color of the pixel.
- * @param target Points to which SDL_Surface the pixel should be put.
+ * @param targetSurface Points to which SDL_Surface the pixel should be put.
  */
-void putPixel(int x, int y, SDL_Color c, unsigned char *target)
+void putPixel(int x, int y, SDL_Color c, SDL_Surface *targetSurface)
 {
-    target += 4 * ((WINDOW_W * y) + x);
+    unsigned char *target = (unsigned char *) targetSurface->pixels + y * targetSurface->pitch + x * targetSurface->format->BytesPerPixel;
     target[0] = c.b;
     target[1] = c.g;
     target[2] = c.r;
+    if (targetSurface->format->BytesPerPixel == 4) {
+        target[3] = 255;
+    }
 }
 
 /**
@@ -1921,9 +1925,9 @@ void colorFill(SDL_Color c, SDL_Surface *sprite)
     for (int yy = 0; yy < sprite->h; ++yy) {
         for (int xx = 0; xx < sprite->w; ++xx) {
             unsigned char *target = (unsigned char *) sprite->pixels + yy * sprite->pitch + xx * sprite->format->BytesPerPixel;
-            target[0] *= c.b / 255.0;
+            target[0] *= c.r / 255.0;
             target[1] *= c.g / 255.0;
-            target[2] *= c.r / 255.0;
+            target[2] *= c.b / 255.0;
         }
     }
 }
