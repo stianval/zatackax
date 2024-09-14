@@ -258,10 +258,13 @@ char *buttonName(button b)
     }
     else if ((b >= SDL_SCANCODE_A && b <= SDL_SCANCODE_Z)
                  || (b >= SDL_SCANCODE_0 && b <= SDL_SCANCODE_9)) {
-        snprintf(keyname, BUTTON_NAME_MAX_LEN, "%c", b);
+        snprintf(keyname, BUTTON_NAME_MAX_LEN, "%c", SDL_GetKeyFromScancode(b));
     }
-    else if (b >= SDL_SCANCODE_F1 && b <= SDL_SCANCODE_F15) {
+    else if (b >= SDL_SCANCODE_F1 && b <= SDL_SCANCODE_F12) {
         snprintf(keyname, BUTTON_NAME_MAX_LEN, "F%d", b - SDL_SCANCODE_F1 + 1);
+    }
+    else if (b >= SDL_SCANCODE_F13 && b <= SDL_SCANCODE_F15) {
+        snprintf(keyname, BUTTON_NAME_MAX_LEN, "F%d", b - SDL_SCANCODE_F13 + 13);
     }
     else {
         switch (b) {
